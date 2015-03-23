@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
@@ -7,15 +8,14 @@ using System.Collections;
 
 
 public class Chunk : MonoBehaviour {
-
+	
 	Block[ , ] blocks;
 	public static int chunkSize = 16;
 	public bool update = true;
 
 	MeshFilter filter;
 	PolygonCollider2D coll;
-
-
+	
 	//Use this for initialization
 	void Start () {
 		filter = gameObject.GetComponent<MeshFilter>();
@@ -34,7 +34,7 @@ public class Chunk : MonoBehaviour {
 		
 		blocks[3, 3] = new BlockAir(3 % 2 == 0);
 		
-		UpdateChunk();		
+		UpdateChunk();	
 	}
 
 	// Updates the chunk based on its contents
@@ -49,8 +49,9 @@ public class Chunk : MonoBehaviour {
 				meshData = blocks[x, y].Blockdata(this, x, y, meshData);
 			}
 		}
-		
+
 		RenderMesh(meshData);
+		UpdateCollider (meshData);
 	}
 	
 	// Sends the calculated mesh information
@@ -64,6 +65,17 @@ public class Chunk : MonoBehaviour {
 		filter.mesh.RecalculateNormals();
 	}
 
+	void UpdateCollider (MeshData meshData) 
+	{
+		PolygonCollider2D collider = GetComponent<PolygonCollider2D>();
+		int i = 0;
+		collider.pathCount = meshData.colPaths.Count;
+		foreach (List<Vector2> path in meshData.colPaths) {
+			collider.SetPath (i, path.ToArray());
+			i++;
+		}
+	}
+
 	//Update is called once per frame
 	void Update () {
 		
@@ -72,13 +84,6 @@ public class Chunk : MonoBehaviour {
 	public Block GetBlock(int x, int y)
 	{
 		return blocks[x, y];
-	}
-
-	//Sends the calculated mesh information
-	//to the mesh and collision components
-	void RenderMesh()
-	{
-		
 	}
 
 	/*

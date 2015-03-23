@@ -16,7 +16,6 @@ public class Block {
 		return true;
 	}
 
-	
 	public virtual MeshData Blockdata
 		(Chunk chunk, int x, int y, MeshData meshData)
 	{
@@ -32,9 +31,9 @@ public class Block {
 	private MeshData FaceDataUp
 		(Chunk chunk, int x, int y, MeshData meshData)
 	{
-		meshData.vertices.Add(new Vector3(x/2 + 0, y + 0, 0.1f));
-		meshData.vertices.Add(new Vector3(x/2 + 0.5f, y + 1, 0.2f));
-		meshData.vertices.Add(new Vector3(x/2 + 1, y + 0, 0.3f));
+		meshData.AddVertex(new Vector3(x/2 + 0, y + 0, 0.1f));
+		meshData.AddVertex(new Vector3(x/2 + 0.5f, y + 1, 0.2f));
+		meshData.AddVertex(new Vector3(x/2 + 1, y + 0, 0.3f));
 		meshData.AddTriangle();
 
 		meshData.uv.Add(new Vector2(0, 0));
@@ -47,9 +46,9 @@ public class Block {
 	private MeshData FaceDataDown
 		(Chunk chunk, int x, int y, MeshData meshData)
 	{
-		meshData.vertices.Add(new Vector3(x/2 + 0.5f, y + 1, 0.4f));
-		meshData.vertices.Add(new Vector3(x/2 + 1.5f, y + 1, 0.5f));
-		meshData.vertices.Add(new Vector3(x/2 + 1, y + 0, 0.6f));
+		meshData.AddVertex(new Vector3(x/2 + 0.5f, y + 1, 0.4f));
+		meshData.AddVertex(new Vector3(x/2 + 1.5f, y + 1, 0.5f));
+		meshData.AddVertex(new Vector3(x/2 + 1, y + 0, 0.6f));
 		meshData.AddTriangle();
 
 		meshData.uv.Add(new Vector2(1*tileSize, 0));
