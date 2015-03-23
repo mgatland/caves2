@@ -4,6 +4,7 @@ using System.Collections;
 public class Block {
 
 	private bool IsUp;
+	const float tileSize = 1f/128f*10;
 
 	//Base block constructor
 	public Block(bool IsUp){
@@ -37,8 +38,8 @@ public class Block {
 		meshData.AddTriangle();
 
 		meshData.uv.Add(new Vector2(0, 0));
-		meshData.uv.Add(new Vector2(0, 1));
-		meshData.uv.Add(new Vector2(1, 1));
+		meshData.uv.Add(new Vector2(0, 1*tileSize));
+		meshData.uv.Add(new Vector2(1*tileSize, 1*tileSize));
 
 		return meshData;
 	}
@@ -51,9 +52,9 @@ public class Block {
 		meshData.vertices.Add(new Vector3(x/2 + 1, y + 0, 0.6f));
 		meshData.AddTriangle();
 
-		meshData.uv.Add(new Vector2(0, 0));
-		meshData.uv.Add(new Vector2(0, 1));
-		meshData.uv.Add(new Vector2(1, 1));
+		meshData.uv.Add(new Vector2(1*tileSize, 0));
+		meshData.uv.Add(new Vector2(1*tileSize, 1*tileSize));
+		meshData.uv.Add(new Vector2(2*tileSize, 1*tileSize));
 
 		return meshData;
 	}
