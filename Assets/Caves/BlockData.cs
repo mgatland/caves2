@@ -2,13 +2,11 @@
 using System.Collections;
 
 public class Block {
-
-	private bool IsUp;
-	const float tileSize = 1f/128f*10;
+	
+	const float tileSize = 1f/128f*10; //for UVs
 
 	//Base block constructor
-	public Block(bool IsUp){
-		this.IsUp = IsUp;
+	public Block(){
 	}
 
 	public virtual bool IsSolid()
@@ -19,7 +17,9 @@ public class Block {
 	public virtual MeshData Blockdata
 		(Chunk chunk, int x, int y, MeshData meshData)
 	{
-		if (IsUp) {
+		bool isUp = (x % 2 == 0);
+		if (y % 2 == 0) isUp = !isUp;
+		if (isUp) {
 			meshData = FaceDataUp(chunk, x, y, meshData);
 		} else {
 			meshData = FaceDataDown(chunk, x, y, meshData);
@@ -31,9 +31,9 @@ public class Block {
 	private MeshData FaceDataUp
 		(Chunk chunk, int x, int y, MeshData meshData)
 	{
-		meshData.AddVertex(new Vector3(x/2 + 0, y + 0, 0.1f));
-		meshData.AddVertex(new Vector3(x/2 + 0.5f, y + 1, 0.2f));
-		meshData.AddVertex(new Vector3(x/2 + 1, y + 0, 0.3f));
+		meshData.AddVertex(new Vector3(x + 0, y * 2 + 0, 0.1f));
+		meshData.AddVertex(new Vector3(x + 1, y * 2 + 2, 0.1f));
+		meshData.AddVertex(new Vector3(x + 2, y * 2 + 0, 0.2f));
 		meshData.AddTriangle();
 
 		meshData.uv.Add(new Vector2(0, 0));
@@ -46,9 +46,9 @@ public class Block {
 	private MeshData FaceDataDown
 		(Chunk chunk, int x, int y, MeshData meshData)
 	{
-		meshData.AddVertex(new Vector3(x/2 + 0.5f, y + 1, 0.4f));
-		meshData.AddVertex(new Vector3(x/2 + 1.5f, y + 1, 0.5f));
-		meshData.AddVertex(new Vector3(x/2 + 1, y + 0, 0.6f));
+		meshData.AddVertex(new Vector3(x, y * 2 + 2, 0.1f));
+		meshData.AddVertex(new Vector3(x + 2, y * 2 + 2, 0.1f));
+		meshData.AddVertex(new Vector3(x + 1, y * 2 + 0, 0.2f));
 		meshData.AddTriangle();
 
 		meshData.uv.Add(new Vector2(1*tileSize, 0));

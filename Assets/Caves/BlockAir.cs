@@ -3,8 +3,8 @@ using System.Collections;
 
 public class BlockAir : Block
 {
-	public BlockAir(bool IsUp)
-		: base(IsUp)
+	public BlockAir()
+		: base()
 	{
 		
 	}

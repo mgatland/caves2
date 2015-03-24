@@ -9,8 +9,9 @@ using System.Collections.Generic;
 
 public class Chunk : MonoBehaviour {
 	
-	private static int chunkSize = World.chunkSize;
-	Block[ , ] blocks = new Block[chunkSize, chunkSize];
+	private static int chunkXSize = World.chunkXSize;
+	private static int chunkYSize = World.chunkYSize;
+	Block[ , ] blocks = new Block[chunkXSize, chunkYSize];
 	public bool update = false;
 	public World world;
 	public WorldPos pos;
@@ -27,11 +28,14 @@ public class Chunk : MonoBehaviour {
 	// Updates the chunk based on its contents
 	void UpdateChunk()
 	{
+		System.Diagnostics.Stopwatch st = new System.Diagnostics.Stopwatch();
+		st.Start();
+		
 		MeshData meshData = new MeshData();
 		
-		for (int x = 0; x < chunkSize; x++)
+		for (int x = 0; x < chunkXSize; x++)
 		{
-			for (int y = 0; y < chunkSize; y++)
+			for (int y = 0; y < chunkYSize; y++)
 			{
 				meshData = blocks[x, y].Blockdata(this, x, y, meshData);
 			}
@@ -39,6 +43,9 @@ public class Chunk : MonoBehaviour {
 
 		RenderMesh(meshData);
 		UpdateCollider (meshData);
+
+		st.Stop();
+		Debug.Log(string.Format("Chunk took {0} ms to complete", st.ElapsedMilliseconds));
 	}
 	
 	// Sends the calculated mesh information
@@ -72,22 +79,30 @@ public class Chunk : MonoBehaviour {
 
 	public Block GetBlock(int x, int y)
 	{
-		if(InRange(x) && InRange(y))
+		if(InRangeX(x) && InRangeY(y))
 			return blocks[x, y];
 		return world.GetBlock(pos.x + x, pos.y + y);
 	}
 	
-	public static bool InRange(int index)
+	public static bool InRangeX(int index)
 	{
-		if (index < 0 || index >= chunkSize)
+		if (index < 0 || index >= chunkXSize)
 			return false;
 		
 		return true;
 	}
 
+	public static bool InRangeY(int index)
+	{
+		if (index < 0 || index >= chunkYSize)
+			return false;
+		
+		return true;
+	}
+	
 	public void SetBlock(int x, int y, Block block)
 	{
-		if (InRange(x) && InRange(y))
+		if (InRangeX(x) && InRangeY(y))
 		{
 			blocks[x, y] = block;
 		}

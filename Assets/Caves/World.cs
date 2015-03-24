@@ -7,15 +7,19 @@ public class World : MonoBehaviour {
 	public Dictionary<WorldPos, Chunk> chunks = new Dictionary<WorldPos, Chunk>();
 	public GameObject chunkPrefab;
 
-	public static int chunkSize = 16;
+	public static int chunkXSize = 16;
+	public static int chunkYSize = 8;
+	public static int triSize = 2;
 
 	// Use this for initialization
 	void Start () {
-		for (int x = -1; x < 1; x++) {
-			for (int y = -1; y < 1; y++) {
-				CreateChunk(x * chunkSize, y * chunkSize);
+
+		for (int x = -2; x < 2; x++) {
+			for (int y = -2; y < 2; y++) {
+				CreateChunk(x * chunkXSize * triSize / 2, y * chunkYSize * triSize);
 			}
 		}
+
 	}
 	
 	// Update is called once per frame
@@ -41,11 +45,11 @@ public class World : MonoBehaviour {
 		//Add it to the chunks dictionary with the position as the key
 		chunks.Add(worldPos, newChunk);
 
-		for (int xi = 0; xi < chunkSize; xi++)
+		for (int xi = 0; xi < chunkXSize; xi++)
 		{
-			for (int yi = 0; yi < chunkSize; yi++)
+			for (int yi = 0; yi < chunkYSize; yi++)
 			{
-				SetBlock(x + xi, y + yi, new Block(xi % 2 == 0));
+				SetBlock(x + xi, y + yi, new Block());
 			}
 		}
 	}
@@ -53,9 +57,10 @@ public class World : MonoBehaviour {
 	public Chunk GetChunk(int x, int y)
 	{
 		WorldPos pos = new WorldPos();
-		float multiple = chunkSize;
-		pos.x = Mathf.FloorToInt(x / multiple ) * chunkSize;
-		pos.y = Mathf.FloorToInt(y / multiple ) * chunkSize;
+		float multipleX = chunkXSize * triSize / 2;
+		float multipleY = chunkYSize * triSize;
+		pos.x = Mathf.FloorToInt(x / multipleX ) * chunkXSize * triSize / 2;
+		pos.y = Mathf.FloorToInt(y / multipleY ) * chunkYSize * triSize;
 		
 		Chunk containerChunk = null;
 		chunks.TryGetValue(pos, out containerChunk);
@@ -69,12 +74,12 @@ public class World : MonoBehaviour {
 		{
 			Block block = containerChunk.GetBlock(
 				x - containerChunk.pos.x,
-				y -containerChunk.pos.y);
+				y - containerChunk.pos.y);
 			return block;
 		}
 		else
 		{
-			return new BlockAir(x % 2 == 0);
+			return new BlockAir();
 		}
 	}
 
