@@ -6,9 +6,11 @@ public class GraceShip : MonoBehaviour {
 	private Rigidbody2D m_Rigidbody2D;
 	private static float m_MaxSpeed = 300f;
 	private bool m_FacingRight = true;
+	private GraceGun gun;
 	
 	void Awake () {
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
+		gun = GetComponent<GraceGun>();
 	}
 
 	public void Move(float moveX, float moveY, bool shoot)
@@ -25,6 +27,10 @@ public class GraceShip : MonoBehaviour {
 		else if (moveX < 0 && m_FacingRight)
 		{
 			Flip();
+		}
+
+		if (shoot) {
+			gun.Shoot();
 		}
 	}
 
