@@ -4,7 +4,15 @@ using System.Collections.Generic;
 
 public class World : MonoBehaviour {
 
-	public Dictionary<WorldPos, Chunk> chunks = new Dictionary<WorldPos, Chunk>();
+	//from http://alexstv.com/index.php/posts/unity-voxel-block-tutorial-pt-4
+
+	//x and y == World coordinates == Unity coordinates == WorldPos
+	//chunkX and chunkY == chunk index == ChunkPos
+	//tX and tY == triangle index. Global, not relative to a particular chunk
+	//ctX and ctY refer to triangle index within one chunk.
+
+
+	public Dictionary<ChunkPos, Chunk> chunks = new Dictionary<ChunkPos, Chunk>();
 	public GameObject chunkPrefab;
 
 	public static int chunkXSize = 16;
@@ -13,68 +21,77 @@ public class World : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
-		for (int x = -2; x < 2; x++) {
-			for (int y = -2; y < 2; y++) {
-				CreateChunk(x * chunkXSize * triSize / 2, y * chunkYSize * triSize);
+		int minX = 0;
+		int minY = 0;
+		int maxX = 4;
+		int maxY = 4;
+		for (int chunkX = minX; chunkX < maxX; chunkX++) {
+			for (int chunkY = minY; chunkY < maxY; chunkY++) {
+				ChunkPos pos = new ChunkPos(chunkX, chunkY);
+				CreateChunk(pos);
 			}
 		}
-
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 	
+
+		/*Vector3 mousePos = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+		TriPos triPos = new WorldPos(mousePos.x, mousePos.y).toTriPos();
+		if (Random.Range (0f, 1f) > 0.5) {
+			SetBlock (triPos, new BlockAir ());
+		} else {
+			SetBlock (triPos, new Block ());
+		}*/
 	}
 
-	public void CreateChunk(int x, int y)
+	public void CreateChunk(ChunkPos chunkPos)
 	{
-		WorldPos worldPos = new WorldPos(x, y);
-		
-		//Instantiate the chunk at the coordinates using the chunk prefab
+		WorldPos worldPos = chunkPos.toWorldPos();
+
+		//Instantiate the chunk at its world coordinates
 		GameObject newChunkObject = Instantiate(
-			chunkPrefab, new Vector3(x, y),
+			chunkPrefab, new Vector3(worldPos.x, worldPos.y),
 			Quaternion.Euler(Vector3.zero)
 			) as GameObject;
 		
 		Chunk newChunk = newChunkObject.GetComponent<Chunk>();
-		
-		newChunk.pos = worldPos;
+		newChunk.pos = chunkPos;
 		newChunk.world = this;
 		
 		//Add it to the chunks dictionary with the position as the key
-		chunks.Add(worldPos, newChunk);
+		chunks.Add(chunkPos, newChunk);
+
+		TriPos startTriPos = chunkPos.toTriPos ();
 
 		for (int xi = 0; xi < chunkXSize; xi++)
 		{
 			for (int yi = 0; yi < chunkYSize; yi++)
 			{
-				SetBlock(x + xi, y + yi, new Block());
+				TriPos triPos = new TriPos(startTriPos.x + xi, startTriPos.y + yi);
+				SetBlock(triPos, new Block());
 			}
 		}
 	}
 
-	public Chunk GetChunk(int x, int y)
+	public Chunk GetChunk(TriPos triPos)
 	{
-		WorldPos pos = new WorldPos();
-		float multipleX = chunkXSize * triSize / 2;
-		float multipleY = chunkYSize * triSize;
-		pos.x = Mathf.FloorToInt(x / multipleX ) * chunkXSize * triSize / 2;
-		pos.y = Mathf.FloorToInt(y / multipleY ) * chunkYSize * triSize;
-		
+		ChunkPos pos = triPos.toChunkPos ();
 		Chunk containerChunk = null;
 		chunks.TryGetValue(pos, out containerChunk);
+		if (containerChunk == null) {
+			Debug.Log ("GetChunk: No chunk at " + pos.ToString ());
+		}
 		return containerChunk;
 	}
 	
-	public Block GetBlock(int x, int y)
+	public Block GetBlock(TriPos triPos)
 	{
-		Chunk containerChunk = GetChunk(x, y);
+		Chunk containerChunk = GetChunk(triPos);
 		if (containerChunk != null)
 		{
-			Block block = containerChunk.GetBlock(
-				x - containerChunk.pos.x,
-				y - containerChunk.pos.y);
+			Block block = containerChunk.GetBlock(triPos);
 			return block;
 		}
 		else
@@ -83,24 +100,25 @@ public class World : MonoBehaviour {
 		}
 	}
 
-	public void SetBlock(int x, int y, Block block)
+	public void SetBlock(TriPos triPos, Block block)
 	{
-		Chunk chunk = GetChunk(x, y);
+		Chunk chunk = GetChunk(triPos);
 		
-		if (chunk != null)
-		{
-			chunk.SetBlock(x - chunk.pos.x, y - chunk.pos.y, block);
+		if (chunk != null) {
+			chunk.SetBlock (triPos, block);
 			chunk.update = true;
+		} else {
+			Debug.Log ("SetBlock: No chunk at " + triPos.toChunkPos().ToString());
 		}
 	}
 
-	public void DestroyChunk(int x, int y)
+	public void DestroyChunk(int notimplemented)
 	{
-		Chunk chunk = null;
-		if (chunks.TryGetValue(new WorldPos(x, y), out chunk))
-		{
-			Object.Destroy(chunk.gameObject);
-			chunks.Remove(new WorldPos(x, y));
-		}
+		//Chunk chunk = null;
+		//if (chunks.TryGetValue(new WorldPos(x, y), out chunk))
+		//{
+		//	Object.Destroy(chunk.gameObject);
+		//	chunks.Remove(new WorldPos(x, y));
+		//}
 	}
 }
